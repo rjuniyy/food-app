@@ -25,6 +25,7 @@ import Wallet from '../../../assets/icons/wallet.svg';
 import DotsThree from '../../../assets/icons/dots-three.svg';
 import { TouchableOpacity } from 'react-native';
 import Rating from '../../../assets/icons/rating.svg';
+import { SuccessToast, FailedToast } from '../../components/Toast';
 
 export default function DetailOrderScreen({ route, navigation }) {
   const { items, onDelete, session } = route.params;
@@ -33,8 +34,9 @@ export default function DetailOrderScreen({ route, navigation }) {
   const [isAlertOpen, setIsAlertOpen] = React.useState(false);
   const cancelRef = React.useRef(null);
   const onAlertClose = () => setIsAlertOpen(false);
-
   const { isOpen, onOpen, onClose } = useDisclose();
+  const [successToast, setSuccessToast] = useState(false);
+  const [failedToast, setFailedToast] = useState(false);
 
   const itemsId = items.map((item) => item.orders.id);
   const itemId = itemsId[0];
@@ -53,18 +55,61 @@ export default function DetailOrderScreen({ route, navigation }) {
         .eq('user_id', session.user.id)
         .select();
 
-      if (error) throw error;
+      if (!error) {
+        setSuccessToast(true);
+        setTimeout(() => {
+          setSuccessToast(false);
+        }, 3000);
+      } else {
+        setFailedToast(true);
+        setTimeout(() => {
+          setFailedToast(false);
+        }, 3000);
+      }
 
       // navigation.navigate('Canceled', { refresh: true });
-      navigation.navigate('Unpaid', { refresh: true });
 
       // Navigate back after successful deletion
     } catch (error) {
       console.error('Error updating order:', error);
+    } finally {
+      setTimeout(() => {
+        navigation.navigate('Profile');
+      }, 3000);
     }
   };
 
-  const renderItem = ({ item, index }) => {
+  const handleCompleteOrder = async () => {
+    try {
+      setIsAlertOpen(false);
+      const { data, error } = await supabase
+        .from('orders')
+        .update({ status: 'selesai' })
+        .eq('id', itemId)
+        .select();
+
+      if (!error) {
+        setSuccessToast(true);
+        setTimeout(() => {
+          setSuccessToast(false);
+        }, 3000);
+      } else {
+        setFailedToast(true);
+        setTimeout(() => {
+          setFailedToast(false);
+        }, 3000);
+      }
+    } catch (error) {
+      console.error('Error updating order', error);
+      return;
+    } finally {
+      setTimeout(() => {
+        navigation.navigate('Profile');
+      }, 3000);
+    }
+  };
+
+  const renderItem = ({ item }) => {
     return (
       <Box
         marginBottom="2"
@@ -175,13 +220,9 @@ export default function DetailOrderScreen({ route, navigation }) {
           keyExtractor={(item) => item.id.toString()}
           mt="1"
         />
-        {/* <Box alignItems="center">
-          <Text fontFamily="RedHatDisplaySemiBold">Beri ulasan menu ini</Text>
-          <StarRating rating={rating} maxStars={5} onRate={handleRate} />
-          <Text fontFamily="RedHatDisplaySemiBold">
-            Anda memberi bintang {rating}
-          </Text>
-        </Box> */}
+
+        {successToast && <SuccessToast showToast={successToast} />}
+        {failedToast && <FailedToast showToast={failedToast} />}
       </Box>
 
       {status === 'dikirim' && (
@@ -189,6 +230,7 @@ export default function DetailOrderScreen({ route, navigation }) {
           <Actionsheet.Content>
             <Actionsheet.Item
               startIcon={<CheckIcon size="6" color="green.500" />}
+              onPress={handleCompleteOrder}
             >
               Selesaikan Pesanan
             </Actionsheet.Item>
@@ -239,8 +281,7 @@ export default function DetailOrderScreen({ route, navigation }) {
                   <Path d="M1.11111 17.7778C1.11111 19 2.11111 20 3.33333 20H12.2222C13.4444 20 14.4444 19 14.4444 17.7778V4.44444H1.11111V17.7778ZM15.5556 1.11111H11.6667L10.5556 0H5L3.88889 1.11111H0V3.33333H15.5556V1.11111Z" />
                 </Icon>
               }
-              // onPress={handleCancelButton}
-              onPress={() => setIsAlertOpen(true)}
+              onPress={handleCancelButton}
             >
               <Text fontSize="14" color="red.500">
                 Batalkan Transaksi

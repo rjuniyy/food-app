@@ -19,6 +19,7 @@ import {
   TouchableWithoutFeedback,
 } from 'react-native';
 import { supabase } from '../../services/supabase';
+import { SuccessToast, FailedToast } from '../../components/Toast';
 
 export const SLIDER_WIDTH = Dimensions.get('window').width + 80;
 export const ITEM_WIDTH = Math.round(SLIDER_WIDTH * 0.7);
@@ -28,8 +29,9 @@ export default function ReviewScreen({ route, navigation }) {
   const [reviewData, setReviewData] = useState([]);
   const [rating, setRating] = useState(0);
   const [ratingText, setRatingText] = useState('');
+  const [successToast, setSuccessToast] = useState(false);
+  const [failedToast, setFailedToast] = useState(false);
 
-  // eslint-disable-next-line react/prop-types
   const { menu_items, orders } = items.item;
   const { name, image_urls } = menu_items;
 
@@ -74,6 +76,17 @@ export default function ReviewScreen({ route, navigation }) {
         })
         .eq('id', reviewData[0].id);
 
+      if (!error) {
+        setSuccessToast(true);
+        setTimeout(() => {
+          setSuccessToast(false);
+        }, 4000);
+      } else {
+        setFailedToast(true);
+        setTimeout(() => {
+          setFailedToast(false);
+        }, 4000);
+      }
       if (error) {
         console.error('Error updating reviews:', error);
         return;
@@ -111,13 +124,25 @@ export default function ReviewScreen({ route, navigation }) {
       if (orderitemsError) {
         console.error('Update orderitems failed', orderitemsError);
       }
+
+      if (reviewData && orderItems) {
+        setSuccessToast(true);
+        setTimeout(() => {
+          setSuccessToast(false);
+        }, 3000);
+      } else {
+        setFailedToast(true);
+        setTimeout(() => {
+          setFailedToast(false);
+        }, 3000);
+      }
     } catch (error) {
       console.error('Error inserting data', error);
       return;
     } finally {
-      navigation.navigate('Order', {
-        screen: 'Completed',
-      });
+      setTimeout(() => {
+        navigation.navigate('Profile');
+      }, 3000);
     }
   };
 
@@ -163,6 +188,8 @@ export default function ReviewScreen({ route, navigation }) {
                 {reviewData.length > 0 ? 'Update Penilaian' : 'Kirim Penilaian'}
               </Text>
             </Button>
+            {successToast && <SuccessToast showToast={successToast} />}
+            {failedToast && <FailedToast showToast={failedToast} />}
           </Box>
         </KeyboardAvoidingView>
       </TouchableWithoutFeedback>
