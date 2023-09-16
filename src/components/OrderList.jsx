@@ -48,10 +48,10 @@ export default function OrderList({ navigation, session, status, refresh }) {
       const itemsWithSameOrderId = data.filter(
         (orderItem) => orderItem.order_id === item.order_id,
       );
+      // console.log('Item wirh same order:', itemsWithSameOrderId);
 
       navigation.navigate('DetailOrder', {
         items: itemsWithSameOrderId,
-        // onDelete: fetchOrders,
       });
     };
 

@@ -14,7 +14,9 @@ import {
   useDisclose,
   Icon,
   AlertDialog,
-  Center,
+  CloseIcon,
+  CheckIcon,
+  SunIcon,
 } from 'native-base';
 import { supabase } from '../../services/supabase';
 import { Actionsheet } from 'native-base';
@@ -22,7 +24,7 @@ import { Path } from 'react-native-svg';
 import Wallet from '../../../assets/icons/wallet.svg';
 import DotsThree from '../../../assets/icons/dots-three.svg';
 import { TouchableOpacity } from 'react-native';
-import { MaterialCommunityIcons } from '@expo/vector-icons';
+import Rating from '../../../assets/icons/rating.svg';
 
 export default function DetailOrderScreen({ route, navigation }) {
   const { items, onDelete, session } = route.params;
@@ -62,36 +64,27 @@ export default function DetailOrderScreen({ route, navigation }) {
     }
   };
 
-  const renderItem = ({ item }) => {
+  const renderItem = ({ item, index }) => {
     return (
-      <Box mb="2">
+      <Box
+        marginBottom="2"
+        bgColor="white"
+        height={120}
+        alignSelf="center"
+        width="90%"
+        rounded="15"
+        shadow="2"
+      >
         <Pressable
-          bgColor="white"
-          height={120}
-          alignSelf="center"
-          width="90%"
-          rounded="15"
-          flexDirection="column"
-          shadow="2"
           onPress={() => {
-            if (item.orders.review_id === null && status === 'selesai') {
-              // Execute this action when the condition is true
-              // For example, navigate to 'Review'
+            if (item.review_id === null && status === 'selesai') {
+              // Create a new object with only the selected item
+              const selectedItem = { item };
+
+              // Pass the selected item as a parameter to the 'Review' screen
               navigation.navigate('Review', {
-                items: items,
+                items: selectedItem,
               });
-            } else {
-              // navigation.navigate('Detail', {
-              //   id: item.menu_id,
-              //   name: item.menu_items.name,
-              //   img: item.image_urls,
-              //   desc: item.description,
-              //   stock: item.stock,
-              //   category: item.category,
-              //   price: item.price,
-              //   discount: item.discount,
-              //   final_price: item.final_price,
-              // });
             }
           }}
         >
@@ -121,6 +114,35 @@ export default function DetailOrderScreen({ route, navigation }) {
             </Text>
           </Stack>
         </Pressable>
+        {item.review_id !== null && (
+          <Button
+            colorScheme="pink"
+            startIcon={<Rating height="18" width="18" fill="white" />}
+            position="absolute"
+            bottom="1"
+            right="1"
+            rounded="15"
+            onPress={() => {
+              if (item.review_id !== null && status === 'selesai') {
+                // Create a new object with only the selected item
+                const selectedItem = { item };
+
+                // Pass the selected item as a parameter to the 'Review' screen
+                navigation.navigate('Review', {
+                  items: selectedItem,
+                });
+              }
+            }}
+          >
+            <Text
+              color="white"
+              fontFamily="RedHatDisplaySemiBold"
+              fontSize="12"
+            >
+              Lihat Penilaian
+            </Text>
+          </Button>
+        )}
       </Box>
     );
   };
@@ -160,12 +182,30 @@ export default function DetailOrderScreen({ route, navigation }) {
             Anda memberi bintang {rating}
           </Text>
         </Box> */}
-        <Center>
-          <Text>Kirim Bukti Pembayaran</Text>
-        </Center>
       </Box>
-      <Actionsheet isOpen={isOpen} onClose={onClose}>
-        {status === 'pending' && (
+
+      {status === 'dikirim' && (
+        <Actionsheet isOpen={isOpen} onClose={onClose} size="full">
+          <Actionsheet.Content>
+            <Actionsheet.Item
+              startIcon={<CheckIcon size="6" color="green.500" />}
+            >
+              Selesaikan Pesanan
+            </Actionsheet.Item>
+            <Actionsheet.Item
+              startIcon={<CloseIcon />}
+              onPress={() => setIsAlertOpen(false)}
+              textAlign="center"
+              _text={{ textAlign: 'center' }}
+            >
+              Batal
+            </Actionsheet.Item>
+          </Actionsheet.Content>
+        </Actionsheet>
+      )}
+
+      {status === 'pending' && (
+        <Actionsheet isOpen={isOpen} onClose={onClose}>
           <Actionsheet.Content>
             <Actionsheet.Item
               startIcon={
@@ -207,36 +247,37 @@ export default function DetailOrderScreen({ route, navigation }) {
               </Text>
             </Actionsheet.Item>
           </Actionsheet.Content>
-        )}
-        <AlertDialog
-          leastDestructiveRef={cancelRef}
-          isOpen={isAlertOpen}
-          onClose={onAlertClose}
-        >
-          <AlertDialog.Content>
-            <AlertDialog.CloseButton />
-            <AlertDialog.Header>Batalkan Transaksi?</AlertDialog.Header>
-            <AlertDialog.Body>
-              Anda yakin ingin membatalkan pesanan ini?
-            </AlertDialog.Body>
-            <AlertDialog.Footer>
-              <Button.Group space={2}>
-                <Button
-                  variant="unstyled"
-                  colorScheme="coolGray"
-                  onPress={onAlertClose}
-                  ref={cancelRef}
-                >
-                  Tidak
-                </Button>
-                <Button colorScheme="danger" onPress={handleCancelButton}>
-                  Ya, Batalkan
-                </Button>
-              </Button.Group>
-            </AlertDialog.Footer>
-          </AlertDialog.Content>
-        </AlertDialog>
-      </Actionsheet>
+
+          <AlertDialog
+            leastDestructiveRef={cancelRef}
+            isOpen={isAlertOpen}
+            onClose={onAlertClose}
+          >
+            <AlertDialog.Content>
+              <AlertDialog.CloseButton />
+              <AlertDialog.Header>Batalkan Transaksi?</AlertDialog.Header>
+              <AlertDialog.Body>
+                Anda yakin ingin membatalkan pesanan ini?
+              </AlertDialog.Body>
+              <AlertDialog.Footer>
+                <Button.Group space={2}>
+                  <Button
+                    variant="unstyled"
+                    colorScheme="coolGray"
+                    onPress={onAlertClose}
+                    ref={cancelRef}
+                  >
+                    Tidak
+                  </Button>
+                  <Button colorScheme="danger" onPress={handleCancelButton}>
+                    Ya, Batalkan
+                  </Button>
+                </Button.Group>
+              </AlertDialog.Footer>
+            </AlertDialog.Content>
+          </AlertDialog>
+        </Actionsheet>
+      )}
       {/* <ScrollView>
         {/* <Box
           bgColor="white"
