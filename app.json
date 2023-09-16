@@ -1,30 +1,43 @@
 {
   "expo": {
-    "name": "food-app",
+    "name": "Nyemilicious",
     "slug": "food-app",
     "version": "1.0.0",
     "orientation": "portrait",
-    "icon": "./assets/icon.png",
+    "icon": "./assets/images/splash.png",
     "userInterfaceStyle": "light",
     "splash": {
-      "image": "./assets/splash.png",
+      "image": "./assets/images/splash.png",
       "resizeMode": "contain",
       "backgroundColor": "#ffffff"
     },
-    "assetBundlePatterns": [
-      "**/*"
-    ],
+    "assetBundlePatterns": ["**/*"],
     "ios": {
       "supportsTablet": true
     },
     "android": {
       "adaptiveIcon": {
-        "foregroundImage": "./assets/adaptive-icon.png",
+        "foregroundImage": "./assets/images/splash.png",
         "backgroundColor": "#ffffff"
-      }
+      },
+      "permissions": ["android.permission.RECORD_AUDIO"],
+      "package": "com.lemuria.foodapp"
     },
     "web": {
-      "favicon": "./assets/favicon.png"
+      "favicon": "./assets/images/splash.png"
+    },
+    "plugins": [
+      [
+        "expo-image-picker",
+        {
+          "photosPermission": "The app accesses your photos to let you share them with your friends."
+        }
+      ]
+    ],
+    "extra": {
+      "eas": {
+        "projectId": "77060afa-d00b-43ae-97cb-ffb77805c76d"
+      }
     }
   }
 }
