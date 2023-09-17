@@ -71,13 +71,13 @@ export function ButtonQuantity({
       )}
       <Button
         backgroundColor="transparent"
-        borderWidth={2}
+        borderWidth="2"
         borderRadius="20"
         borderColor="pink.400"
         onPress={handleDecrement}
         title="decrement"
-        height="30px"
-        width="30px"
+        height="32px"
+        width="32px"
       >
         <MinRound />
       </Button>

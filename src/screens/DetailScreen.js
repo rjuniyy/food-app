@@ -21,6 +21,7 @@ import { AddCartButton, ButtonQuantity } from '../components/CustomButton';
 import Favorite from '../../assets/icons/favoritebtn.svg';
 import { supabase } from '../services/supabase';
 import AnimatedLottieView from 'lottie-react-native';
+import Icon from 'react-native-vector-icons/FontAwesome';
 
 export const SLIDER_WIDTH = Dimensions.get('window').width + 80;
 export const ITEM_WIDTH = Math.round(SLIDER_WIDTH * 0.7);
@@ -75,6 +76,9 @@ const DetailScreen = ({ route }) => {
         setTimeout(() => {
           setShowAddFavorite(false);
         }, ALERT_TIMEOUT); // Use a named constant instead of a magic number
+      } else {
+        console.error('Error addFavorite:', addedFavoritesError);
+        return;
       }
     } catch (error) {
       console.error('Error inserting favorite', error);
@@ -96,6 +100,9 @@ const DetailScreen = ({ route }) => {
         setTimeout(() => {
           setShowRemoveFavorite(false);
         }, ALERT_TIMEOUT); // Use a named constant instead of a magic number
+      } else {
+        console.error('Error delete favorite data:', error);
+        return;
       }
     } catch (error) {
       console.error('Error deleting favorite', error);
@@ -141,6 +148,17 @@ const DetailScreen = ({ route }) => {
             inactiveSlideShift={0}
             useScrollView={true}
           />
+          <Box position="absolute" bottom="0" right="0" paddingX="3">
+            {existingFavorites.length > 0 ? (
+              <TouchableOpacity onPress={handleRemoveFavorite}>
+                <Favorite fill="pink" />
+              </TouchableOpacity>
+            ) : (
+              <TouchableOpacity onPress={handleAddFavorite}>
+                <Favorite />
+              </TouchableOpacity>
+            )}
+          </Box>
         </Center>
         <Divider mt="5" />
 
@@ -157,29 +175,28 @@ const DetailScreen = ({ route }) => {
                 </Text>
               )}
             </Text>
+            <Box flexDir="row">
+              <Icon name="star" size={18} color="gold" />
+              <Text
+                fontFamily="RedHatDisplaySemiBold"
+                fontSize="12"
+                color="coolGray.400"
+              >
+                {detailItem.avgrating} | {detailItem.ordercount} Terjual
+              </Text>
+            </Box>
           </Stack>
           <Spacer />
 
           <Box justifyContent="center">
-            {existingFavorites.length > 0 ? (
-              <TouchableOpacity onPress={handleRemoveFavorite}>
-                <Favorite fill="pink" />
-              </TouchableOpacity>
-            ) : (
-              <TouchableOpacity onPress={handleAddFavorite}>
-                <Favorite />
-              </TouchableOpacity>
-            )}
+            <ButtonQuantity
+              item={route.params}
+              onIncrement={handleIncrement}
+              onDecrement={handleDecrement}
+              quantity={quantity}
+            />
           </Box>
         </Stack>
-        <Box alignItems="flex-end" marginRight="2">
-          <ButtonQuantity
-            item={route.params}
-            onIncrement={handleIncrement}
-            onDecrement={handleDecrement}
-            quantity={quantity}
-          />
-        </Box>
 
         <Divider />
 

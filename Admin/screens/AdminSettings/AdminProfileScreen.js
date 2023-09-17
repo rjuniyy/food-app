@@ -21,12 +21,66 @@ import {
 import { Ionicons } from '@expo/vector-icons';
 import { useRoute } from '@react-navigation/native';
 import { fetchUser } from '../../../src/services/api';
-import { Dimensions } from 'react-native';
+import { supabase } from '../../../src/services/supabase';
+import { ScreenWidth } from 'react-native-elements/dist/helpers';
 
 export default function AdminProfileScreen({ navigation }) {
   const route = useRoute();
   const { session } = route.params;
   const [userData, setUserData] = useState([]);
+  // Fetch real data for your pie chart
+  const [chartData, setChartData] = useState([]);
+
+  // Fetch order completed data
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        // Fetch data from Supabase
+        const { data: menuItems, error } = await supabase
+          .from('menu_items')
+          .select('name, ordercount'); // Fetch only the required fields
+
+        // Check for errors
+        if (error) {
+          console.error('Error fetching menu items data:', error);
+          return;
+        }
+
+        // Transform the data for the pie chart
+        const chartData = menuItems.map((item) => ({
+          name: item.name,
+          population: item.ordercount,
+          color: getRandomColor(), // Add a function to generate random colors
+          legendFontColor: '#7F7F7F',
+          legendFontSize: 15,
+        }));
+
+        // Update the state with the chart data
+        setChartData(chartData);
+      } catch (error) {
+        console.error('Error fetching order completed data:', error);
+      }
+    };
+
+    fetchData();
+  }, []);
+
+  const getRandomColor = () => {
+    // Generate random values for R, G, and B components
+    const r = Math.floor(Math.random() * 256); // Random integer between 0 and 255
+    const g = Math.floor(Math.random() * 256);
+    const b = Math.floor(Math.random() * 256);
+
+    // Convert the RGB values to hexadecimal format
+    const rHex = r.toString(16).padStart(2, '0'); // Ensure two digits
+    const gHex = g.toString(16).padStart(2, '0');
+    const bHex = b.toString(16).padStart(2, '0');
+
+    // Combine the hexadecimal values to form the color string
+    const color = `#${rHex}${gHex}${bHex}`;
+
+    return color;
+  };
 
   useEffect(() => {
     fetchUser({ session, setUserData });
@@ -89,53 +143,24 @@ export default function AdminProfileScreen({ navigation }) {
             </Button>
           </Stack>
         </Box>
-
-        <Box>
-          <Text>Bezier Line Chart</Text>
-          <LineChart
-            data={{
-              labels: ['January', 'February', 'March', 'April', 'May', 'June'],
-              datasets: [
-                {
-                  data: [
-                    Math.random() * 100,
-                    Math.random() * 100,
-                    Math.random() * 100,
-                    Math.random() * 100,
-                    Math.random() * 100,
-                    Math.random() * 100,
-                  ],
-                },
-              ],
-            }}
-            width={Dimensions.get('window').width} // from react-native
-            height={220}
-            yAxisLabel="Rp"
-            yAxisSuffix="k"
-            yAxisInterval={1} // optional, defaults to 1
-            chartConfig={{
-              backgroundColor: '#e26a00',
-              backgroundGradientFrom: '#fb8c00',
-              backgroundGradientTo: '#ffa726',
-              decimalPlaces: 2, // optional, defaults to 2dp
-              color: (opacity = 1) => `rgba(255, 255, 255, ${opacity})`,
-              labelColor: (opacity = 1) => `rgba(255, 255, 255, ${opacity})`,
-              style: {
-                borderRadius: 16,
-              },
-              propsForDots: {
-                r: '6',
-                strokeWidth: '2',
-                stroke: '#ffa726',
-              },
-            }}
-            bezier
-            style={{
-              marginVertical: 8,
-              borderRadius: 16,
-            }}
-          />
-        </Box>
+      </Box>
+      <Box>
+        <Text alignSelf="center" fontFamily="RedHatDisplayBlack">
+          Pesanan Selesai
+        </Text>
+        <PieChart
+          data={chartData}
+          width={ScreenWidth}
+          height={240}
+          chartConfig={{
+            backgroundColor: '#ffffff',
+            backgroundGradientFrom: '#ffffff',
+            backgroundGradientTo: '#ffffff',
+            color: (opacity = 1) => `rgba(0, 0, 0, ${opacity})`,
+          }}
+          accessor="population"
+          backgroundColor="transparent"
+        />
       </Box>
     </NativeBaseProvider>
   );

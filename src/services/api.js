@@ -8,6 +8,7 @@ export const fetchAllMenu = async () => {
     const { data: menu_items, error } = await supabase
       .from('menu_items')
       .select('*')
+      .order('id', { ascending: false })
       .eq('isAvailable', true);
     if (error) throw error;
 
@@ -23,6 +24,7 @@ export const fetchDrink = async () => {
     const { data: menu_items, error } = await supabase
       .from('menu_items')
       .select('*')
+      .order('id', { ascending: false })
       .eq('isAvailable', true)
       .eq('category_id', 2);
 
@@ -39,6 +41,7 @@ export const fetchDaifuku = async () => {
     const { data: menu_items, error } = await supabase
       .from('menu_items')
       .select('*')
+      .order('id', { ascending: false })
       .eq('isAvailable', true)
       .eq('category_id', 1);
 
@@ -55,6 +58,7 @@ export const fetchGorengan = async () => {
     const { data: menu_items, error } = await supabase
       .from('menu_items')
       .select('*')
+      .order('id', { ascending: false })
       .eq('category_id', 3)
       .eq('isAvailable', true);
 
@@ -76,6 +80,7 @@ export const fetchCartItems = async (setCartItems) => {
     const { data: cart, error } = await supabase
       .from('cart')
       .select('*, menu_items(*)')
+      .order('id', { ascending: false })
       .eq('user_id', user.id);
 
     setCartItems(cart);
@@ -91,6 +96,7 @@ export const fetchFavorites = async ({ setFavorites, session }) => {
     const { data, error } = await supabase
       .from('favorites')
       .select('*, menu_items(*)')
+      .order('id', { ascending: false })
       .eq('user_id', session.user.id);
 
     if (error) {

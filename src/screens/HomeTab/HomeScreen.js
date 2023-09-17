@@ -107,6 +107,8 @@ const HomeScreen = ({ navigation }) => {
               price: item.price,
               discount: item.discount,
               final_price: item.final_price,
+              ordercount: item.ordercount,
+              avgrating: item.avg_rating,
             })
           }
         >
@@ -175,7 +177,7 @@ const HomeScreen = ({ navigation }) => {
               </>
             )}
           </Stack>
-          {item.avg_rating !== null ? (
+          {item.ordercount > 0 ? (
             <Stack
               position="absolute"
               bottom="5%"
@@ -190,8 +192,7 @@ const HomeScreen = ({ navigation }) => {
                 fontSize="12"
                 color="coolGray.400"
               >
-                {''}
-                {item.avg_rating} | {item.order_completed} Pesanan
+                {item.avg_rating} | {item.ordercount} Terjual
               </Text>
             </Stack>
           ) : (

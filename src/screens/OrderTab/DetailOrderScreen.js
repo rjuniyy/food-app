@@ -78,6 +78,7 @@ export default function DetailOrderScreen({ route, navigation }) {
       }, 3000);
     }
   };
+  console.log(itemId);
 
   const handleCompleteOrder = async () => {
     try {
@@ -88,7 +89,13 @@ export default function DetailOrderScreen({ route, navigation }) {
         .eq('id', itemId)
         .select();
 
-      if (!error) {
+      const { data: orderItems, error: errOrderItems } = await supabase
+        .from('orderitems')
+        .update({ is_complete: true })
+        .eq('order_id', itemId)
+        .select();
+
+      if (!error && !errOrderItems) {
         setSuccessToast(true);
         setTimeout(() => {
           setSuccessToast(false);
@@ -98,6 +105,8 @@ export default function DetailOrderScreen({ route, navigation }) {
         setTimeout(() => {
           setFailedToast(false);
         }, 3000);
+        console.error('Failed to update order', error || errOrderItems);
+        return;
       }
     } catch (error) {
       console.error('Error updating order', error);
