@@ -8,14 +8,24 @@ import {
   FlatList,
   Image,
   Divider,
-  View,
-  ScrollView,
+  Center,
 } from 'native-base';
-import { PieChart } from 'react-native-gifted-charts';
+import {
+  LineChart,
+  BarChart,
+  PieChart,
+  ProgressChart,
+  ContributionGraph,
+  StackedBarChart,
+} from 'react-native-chart-kit';
+
 import { Ionicons } from '@expo/vector-icons';
 import { useRoute } from '@react-navigation/native';
 import { fetchUser } from '../../../src/services/api';
 import { supabase } from '../../../src/services/supabase';
+// import { ScreenWidth } from 'react-native-elements/dist/helpers';
+import { Dimensions } from 'react-native';
+const screenWidth = Dimensions.get('window').width;
 
 export default function AdminProfileScreen({ navigation }) {
   const route = useRoute();
@@ -23,10 +33,7 @@ export default function AdminProfileScreen({ navigation }) {
   const [userData, setUserData] = useState([]);
   // Fetch real data for your pie chart
   const [chartData, setChartData] = useState([]);
-  const totalOrderCount = chartData.reduce(
-    (total, item) => total + item.value,
-    0,
-  );
+
   // Fetch order completed data
   useEffect(() => {
     const fetchData = async () => {
@@ -41,10 +48,14 @@ export default function AdminProfileScreen({ navigation }) {
           console.error('Error fetching menu items data:', error);
           return;
         }
+
+        // Transform the data for the pie chart
         const chartData = menuItems.map((item) => ({
-          value: item.ordercount,
-          name: item.name,
-          color: getRandomColor(),
+          name: `${item.name} (${item.ordercount})`,
+          population: item.ordercount,
+          color: getRandomColor(), // Add a function to generate random colors
+          legendFontColor: '#7F7F7F',
+          legendFontSize: 15,
         }));
 
         // Update the state with the chart data
@@ -92,41 +103,6 @@ export default function AdminProfileScreen({ navigation }) {
       </Box>
     </Stack>
   );
-
-  const renderDot = (color) => {
-    return (
-      <View
-        style={{
-          height: 10,
-          width: 10,
-          borderRadius: 5,
-          backgroundColor: color,
-          marginRight: 10,
-        }}
-      />
-    );
-  };
-
-  const renderLegendComponent = (data) => {
-    return data.map((item, index) => (
-      <View
-        key={index} // Make sure to provide a unique key for each legend item
-        flexDir="row"
-      >
-        <Stack direction="row" width="90%">
-          <Text fontSize="14" fontFamily="RedHatDisplay" color="white">
-            {renderDot(item.color)} {item.name}
-          </Text>
-        </Stack>
-        <Stack direction="row" width="10%">
-          <Text fontSize="12" fontFamily="RedHatDisplayBlack" color="white">
-            {item.value}
-          </Text>
-        </Stack>
-      </View>
-    ));
-  };
-  const legends = renderLegendComponent(chartData);
   return (
     <NativeBaseProvider>
       <Box safeArea>
@@ -147,6 +123,7 @@ export default function AdminProfileScreen({ navigation }) {
             keyExtractor={(item) => item.id.toString()}
           />
         </Box>
+
         <Box>
           <Stack direction="row" justifyContent="center" space="1" padding="3">
             <Button
@@ -169,64 +146,26 @@ export default function AdminProfileScreen({ navigation }) {
             </Button>
           </Stack>
         </Box>
-
-        <View
-          style={{
-            margin: 20,
-            padding: 16,
-            borderRadius: 20,
-            backgroundColor: '#232B5D',
-          }}
-        >
-          <Text
-            style={{
-              color: 'white',
-              fontSize: 16,
-              fontFamily: 'RedHatDisplayBlack',
-            }}
-          >
-            Total Penjualan
-          </Text>
-          <View style={{ padding: 10, alignItems: 'center' }}>
-            <PieChart
-              data={chartData}
-              donut
-              showGradient
-              sectionAutoFocus
-              radius={80}
-              innerRadius={60}
-              innerCircleColor={'#232B5D'}
-              centerLabelComponent={() => {
-                return (
-                  <View
-                    style={{ justifyContent: 'center', alignItems: 'center' }}
-                  >
-                    <Text
-                      style={{
-                        fontSize: 22,
-                        color: 'white',
-                        fontFamily: 'RedHatDisplayBlack',
-                      }}
-                    >
-                      {totalOrderCount}
-                    </Text>
-                    <Text
-                      fontSize="14"
-                      color="white"
-                      fontFamily="RedHatDisplayBlack"
-                    >
-                      Produk Terjual
-                    </Text>
-                  </View>
-                );
-              }}
-            />
-          </View>
-          <ScrollView w="100%" h="200">
-            {legends}
-          </ScrollView>
-        </View>
       </Box>
+      <Center>
+        <Text alignSelf="center" fontFamily="RedHatDisplayBlack">
+          Pesanan Selesai
+        </Text>
+        <PieChart
+          data={chartData}
+          width={screenWidth}
+          height={260}
+          chartConfig={{
+            backgroundColor: '#ffffff',
+            backgroundGradientFrom: '#ffffff',
+            backgroundGradientTo: '#ffffff',
+            color: (opacity = 1) => `rgba(0, 0, 0, ${opacity})`,
+          }}
+          accessor="population"
+          backgroundColor="transparent"
+          hasLegend={false}
+        />
+      </Center>
     </NativeBaseProvider>
   );
 }
