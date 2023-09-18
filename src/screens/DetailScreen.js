@@ -1,5 +1,5 @@
 /* eslint-disable react/prop-types */
-import React, { useCallback, useState } from 'react';
+import React, { useState } from 'react';
 import {
   NativeBaseProvider,
   Image,
@@ -11,7 +11,6 @@ import {
   ScrollView,
   Box,
   Stack,
-  Spacer,
   Alert,
   Collapse,
 } from 'native-base';
@@ -162,40 +161,42 @@ const DetailScreen = ({ route }) => {
         </Center>
         <Divider mt="5" />
 
-        <Stack direction="row" padding="3">
+        <Stack padding="3">
           <Stack>
             <Text fontFamily="RedHatDisplaySemiBold" fontSize="20">
               {detailItem.name}
             </Text>
-            <Text fontFamily="RedHatDisplay" fontSize="18" color="pink.600">
-              Rp. {detailItem.final_price}
-              {detailItem.discount !== 0 && (
-                <Text fontSize="14" color="coolGray.400" strikeThrough>
-                  Rp. {detailItem.price}
-                </Text>
-              )}
-            </Text>
-            <Box flexDir="row">
-              <Icon name="star" size={18} color="gold" />
-              <Text
-                fontFamily="RedHatDisplaySemiBold"
-                fontSize="12"
-                color="coolGray.400"
-              >
-                {detailItem.avgrating} | {detailItem.ordercount} Terjual
-              </Text>
-            </Box>
           </Stack>
-          <Spacer />
-
-          <Box justifyContent="center">
-            <ButtonQuantity
-              item={route.params}
-              onIncrement={handleIncrement}
-              onDecrement={handleDecrement}
-              quantity={quantity}
-            />
-          </Box>
+          <Stack direction="row">
+            <Box flexDir="column" width="70%">
+              <Text fontFamily="RedHatDisplay" fontSize="18" color="pink.600">
+                Rp. {detailItem.final_price}
+                {detailItem.discount !== 0 && (
+                  <Text fontSize="14" color="coolGray.400" strikeThrough>
+                    Rp. {detailItem.price}
+                  </Text>
+                )}
+              </Text>
+              <Box flexDir="row">
+                <Icon name="star" size={18} color="gold" />
+                <Text
+                  fontFamily="RedHatDisplaySemiBold"
+                  fontSize="12"
+                  color="coolGray.400"
+                >
+                  {detailItem.avgrating} | {detailItem.ordercount} Terjual
+                </Text>
+              </Box>
+            </Box>
+            <Center width="30%">
+              <ButtonQuantity
+                item={route.params}
+                onIncrement={handleIncrement}
+                onDecrement={handleDecrement}
+                quantity={quantity}
+              />
+            </Center>
+          </Stack>
         </Stack>
 
         <Divider />

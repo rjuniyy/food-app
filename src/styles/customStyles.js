@@ -1,4 +1,7 @@
+import { Dimensions } from 'react-native';
 import { StyleSheet } from 'react-native';
+const windowWidth = Dimensions.get('window').width;
+const windowHeight = Dimensions.get('window').height;
 
 const customStyles = StyleSheet.create({
   title: {
@@ -19,7 +22,7 @@ const customStyles = StyleSheet.create({
       bottom: 0,
       right: 0,
       padding: 5,
-      height: 70,
+      height: windowHeight * 0.08,
     },
     tabBarItemStyle: {
       borderRadius: 40,

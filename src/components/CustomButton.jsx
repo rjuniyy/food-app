@@ -83,7 +83,7 @@ export function ButtonQuantity({
       </Button>
 
       <Text
-        height="35px"
+        height="30px"
         width="30px"
         fontFamily="RedHatDisplaySemiBold"
         textAlign="center"
