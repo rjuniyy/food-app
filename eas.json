@@ -3,6 +3,9 @@
     "preview": {
       "android": {
         "buildType": "apk"
+      },
+      "env": {
+        "SUPABASE_URL": "https://rtsmdhjrozectbtqlofe.supabase.co"
       }
     },
     "preview2": {
