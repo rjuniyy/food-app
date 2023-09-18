@@ -8,7 +8,7 @@ const SplashScreen = ({ navigation }) => {
         <VStack space={3} mt="5" w="90%">
           <Center>
             <Image
-              source={require('../../assets/images/splash.png')}
+              source={require('../../assets/images/icon-round.png')}
               alt="image"
               size="2xl"
             />
