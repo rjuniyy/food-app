@@ -16,3 +16,4 @@ src\services\supabase.js
 
 # Temporary files created by Metro to check the health of the file watcher
 .metro-health-check*
+src/services/supabase.js
